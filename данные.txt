@@ -1,0 +1,8 @@
+https://eljur.ru/api/
+
+DEVKEY: bc4e58bf8c4f389f4a25256da1468baf
+login: shkola800
+password: bdf0389402d33a7f7ab6924e10fe401d
+vendor: nnov0985
+
+https://analytics.shkola800.ru:3000
