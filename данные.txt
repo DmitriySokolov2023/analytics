@@ -5,4 +5,7 @@ login: shkola800
 password: bdf0389402d33a7f7ab6924e10fe401d
 vendor: nnov0985
 
-https://analytics.shkola800.ru:3000
+http://analytics.shkola800.ru:3000
+
+
+pip install -r requirements.txt
