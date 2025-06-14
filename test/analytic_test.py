@@ -2,30 +2,43 @@ import requests
 import pandas as pd
 from sqlalchemy import create_engine
 from pprint import pprint
+import json
+from services.getSchedule import getSchedule
+from services.dbPush import push_in_db
 
-urlGetAssessments = "https://edu.gounn.ru/api/getassessments?devkey=bc4e58bf8c4f389f4a25256da1468baf&login=shkola800&password=bdf0389402d33a7f7ab6924e10fe401d&vendor=nnov0985&token=d3d583dbc7c250ecb8a82ba4a086e91af1e3f3fdc9742121ccab703af8fc1___152565&student=1171&days=20250501-20250507"
-urlGetSchedule = "https://edu.gounn.ru/api/getschedule?devkey=bc4e58bf8c4f389f4a25256da1468baf&login=shkola800&password=bdf0389402d33a7f7ab6924e10fe401d&vendor=nnov0985&token=d3d583dbc7c250ecb8a82ba4a086e91af1e3f3fdc9742121ccab703af8fc1___152565&student=1171&days=20250501-20250507&rings=no"
+def get_teacher(dataSchedule, subject_name, date,id):
+	id_stud = id.replace(" ","")
+	days = dataSchedule['response']['result']['students'][id_stud]['days']
+	day = days.get(date)
+
+	for lesson in day.get('items', {}).values():
+		if lesson.get('name') == subject_name:
+			return lesson.get('teacher')
+	for lesson in day.get('items_extday', []):
+		if lesson.get('name') == subject_name:
+			return lesson.get('teacher')
+	
+def get_course(ej_id):
+	data = []
+	with open("tables/scores.json", "r", encoding="utf-8") as f:
+		data = json.load(f)
+	cleaned_id = ej_id.replace(" ", "")
+	for  record in data:
+		record_id = str(record.get("Ej ID", "")).replace(" ", "")
+		if record_id == cleaned_id:
+			course_name = record.get("Course Year")
+			liter = record.get('Liter')
+			site = record.get('Site')
+			school_year = record.get('School Year')
+			return course_name, liter, site, school_year
 
 
-responseSchedule = requests.get(urlGetSchedule)
-dataSchedule = responseSchedule.json()
+		
+	return None, None
 
-responseAssessments = requests.get(urlGetAssessments)
-dataAssessments = responseAssessments.json()
-
-print(dataSchedule)
-def get_teacher(dataSchedule, subject_name, day):
-	students = dataSchedule['response']['result']['students']
-	for student in students.values():
-		for teacher in student['days'][day]['items']
-
-
-
-
-def get_assessments(data):
-	rows = []
-	students = data['response']['result']['students']
-
+def get_assessments(dataSchedule, dataAssessments, rows, id):
+	students = dataAssessments['response']['result']['students']
+	course_year, liter, site, school_year = get_course(id)
 	for student in students.values():
 		title = student['title']
 
@@ -33,33 +46,57 @@ def get_assessments(data):
 			day_name = day['name']
 			for lesson in day['items'].values():
 				subject_name = lesson['name']
-				teacher = get_teacher(dataSchedule, subject_name, day_name)
+				teacher = get_teacher(dataSchedule, subject_name, day_name,id)
 				for assessment in lesson.get('assessments', []):
-					value = assessment.get('value',[])
-					max_value =int(''.join(filter(str.isdigit, assessment.get('control_type_short', [])))) 
+					value_raw = assessment.get('value', '')
+					try:
+						value = int(value_raw)
+					except (ValueError, TypeError):
+						value = value_raw
+					control_str = str(assessment.get('control_type_short', ''))
+					max_value = int(''.join(filter(str.isdigit, control_str))) if control_str else 0
 					lesson_comment = assessment.get('lesson_comment', '')
 					comment = assessment.get('comment', '')
+					
 					rows.append({
 						'date':day_name,
+						'Ej_ID':id,
                         'title': title,
-												'teacher':'учитель',
-                        'subject': subject_name,
-                        'value': value,
-												'max_value':max_value,
+						'course_year':course_year,
+						'liter':liter,
+						'site':site,
+						'school_year':school_year,
+						'course_name': subject_name,
+						'teacher':teacher,
+                        'score': value,
+						'weight':max_value,
                         'lesson_comment': lesson_comment,
-												'comment':comment
+						'score_comment':comment
                     })
 	return rows
 
-def in_excel(data):
-	table = get_assessments(data)
+def in_excel(table):
 	df = pd.DataFrame(table)
-	df.to_csv("assessments_table.csv", index=False, encoding="utf-8-sig")
+	
+	df.to_excel("tables/assessments_table.xlsx", index=False)
+	# push_in_db()
+
+def main(period):
+	df = pd.read_excel("tables/ids.xlsx")
+	ids = df['ej_id'].astype(str).tolist()
+	all_data = []
+	for id in ids:
+		dataSchedule, dataAssessments = getSchedule(id,period)
+		if (not dataSchedule or'result' not in dataSchedule['response'] or not dataSchedule['response']['result']):continue
+		if (not dataAssessments or'result' not in dataAssessments['response'] or not dataAssessments['response']['result'].get('students')): continue
+
+		all_data = get_assessments(dataSchedule, dataAssessments, all_data, id)
+	in_excel(all_data)
+	
 
 
 
-in_excel(dataAssessments)
-
+main('20250501-20250507')
 
 
 
