@@ -52,9 +52,11 @@ def get_assessments(dataSchedule, dataAssessments, rows, id):
 					try:
 						value = int(value_raw)
 					except (ValueError, TypeError):
-						value = value_raw
+						value = None
+					
 					control_str = str(assessment.get('control_type_short', ''))
-					max_value = int(''.join(filter(str.isdigit, control_str))) if control_str else 0
+					digits_only = ''.join(filter(str.isdigit, control_str))	
+					max_value = int(''.join(filter(str.isdigit, digits_only))) if digits_only else 0
 					lesson_comment = assessment.get('lesson_comment', '')
 					comment = assessment.get('comment', '')
 					
@@ -79,7 +81,7 @@ def in_excel(table):
 	df = pd.DataFrame(table)
 	
 	df.to_excel("tables/assessments_table.xlsx", index=False)
-	# push_in_db()
+	push_in_db(df)
 
 def main(period):
 	df = pd.read_excel("tables/ids.xlsx")
@@ -96,7 +98,7 @@ def main(period):
 
 
 
-main('20250501-20250507')
+main('20250225-20250530')
 
 
 

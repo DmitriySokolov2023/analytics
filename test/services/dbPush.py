@@ -2,18 +2,13 @@ import pandas as pd
 from sqlalchemy import create_engine
 from urllib.parse import quote_plus
 
-def push_in_db():
-    
-    engine = create_engine("postgresql://sokolov:SySHjAoLXO3SxLZa0WNiTRQqtwhQxz2W@dpg-d13h9v3e5dus73eoofug-a.frankfurt-postgres.render.com/analytics_ycdp")
+def push_in_db(df):
 
-    df = pd.DataFrame({
-    'student_id': [1, 2],
-    'name': ['Alice', 'Bob'],
-    'score': [95, 88]
-})
+    engine = create_engine("postgresql://metabase800:c[jkf800@analytics.shkola800.ru:5432/school800")
+
+
     try:
-        # Пытаемся создать таблицу и вставить данные
-        df.to_sql('students_scores', engine, if_exists='fail', index=False, schema='analytics')
+        df.to_sql("student_scores_test_sokolov", engine,schema='public', if_exists="replace", index=False)
         print("✅ Таблица создана и данные загружены")
     except ValueError as e:
         if 'already exists' in str(e):
