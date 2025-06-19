@@ -1,0 +1,15 @@
+import requests 
+from config import API_URL, API_PARAMS
+
+def getData(ej_id, period):
+    id = ej_id.replace(" ", "")
+    urlGetAssessments = f"{API_URL}/getassessments?{API_PARAMS}&student={id}&days={period}"
+    urlGetSchedule = f"{API_URL}/getschedule?{API_PARAMS}&student={id}&days={period}&rings=no"
+
+    responseSchedule = requests.get(urlGetSchedule)
+    responseAssessments = requests.get(urlGetAssessments)
+
+    dataSchedule = responseSchedule.json()
+    dataAssessments = responseAssessments.json()
+
+    return dataSchedule, dataAssessments
