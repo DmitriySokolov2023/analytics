@@ -1,18 +1,11 @@
-import json
+import pandas as pd
 def get_course(ej_id):
-	data = []
-	with open("tables/scores.json", "r", encoding="utf-8") as f:
-		data = json.load(f)
-	cleaned_id = ej_id.replace(" ", "")
-	for  record in data:
-		record_id = str(record.get("Ej ID", "")).replace(" ", "")
-		if record_id == cleaned_id:
-			course_name = record.get("Course Year")
-			liter = record.get('Liter')
-			site = record.get('Site')
-			school_year = record.get('School Year')
-			return course_name, liter, site, school_year
-
-
-		
-	return None, None
+	df = pd.read_excel("tables/az_ids.xlsx")
+	ej_id_clean = str(ej_id).replace(' ', '')
+	result = df[df['ej_id'].astype(str).str.replace(' ', '') == ej_id_clean]
+	if not result.empty:
+		course_year = result.iloc[0]['course_year']
+		liter = result.iloc[0]['liter']
+		return course_year, liter, 'АЗ', '2024'
+	else:return None
+	
