@@ -8,8 +8,10 @@ def getData(ej_id, period):
 
     responseSchedule = requests.get(urlGetSchedule)
     responseAssessments = requests.get(urlGetAssessments)
-
-    dataSchedule = responseSchedule.json()
-    dataAssessments = responseAssessments.json()
+    dataSchedule = None
+    dataAssessments = None
+    if responseSchedule: dataSchedule = responseSchedule.json()
+    if responseAssessments: dataAssessments = responseAssessments.json()
+    
 
     return dataSchedule, dataAssessments
