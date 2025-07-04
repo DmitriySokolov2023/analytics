@@ -34,10 +34,22 @@ def push_to_db(query, data=None):
         conn.rollback()
         return False
 
-def push_many_to_db(query, data_list):
+def push_many_to_db(table_name, data_list):
+    if not data_list:
+        return 0
     try:
         with get_db_connection() as conn, conn.cursor() as cursor:
-            cursor.executemany(query, data_list)
+            columns = data_list[0].keys()
+            query = sql.SQL("""
+                INSERT INTO {} ({})
+                VALUES ({})
+            """).format(
+                sql.Identifier(table_name),
+                sql.SQL(', ').join(map(sql.Identifier, columns)),
+                sql.SQL(', ').join([sql.Placeholder()] * len(columns))
+            )
+            values = [tuple(item.values()) for item in data_list]
+            cursor.executemany(query, values)
             conn.commit()
             return cursor.rowcount
     except psycopg2.DatabaseError as e:
@@ -55,17 +67,3 @@ def create_table(create_table_query):
         print("Ошибка выполнения SQL-запроса:", e)
         return None
     
-create_table(
-    """
-    CREATE TABLE IF NOT EXISTS public.test_sokolov(
-        id text,
-        student_id INTEGER NOT NULL,
-        student_name VARCHAR(100) NOT NULL,
-        class_id INTEGER,
-        subject VARCHAR(50),
-        assessment_date DATE,
-        score INTEGER,
-        teacher_comment TEXT
-    )
-    """
-)

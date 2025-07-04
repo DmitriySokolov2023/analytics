@@ -1,8 +1,9 @@
 from scripts.getData import get_data
 from utils.getTeacher import get_teacher
+from utils.getTrimester import get_trimester
 import pandas as pd
 
-def get_table(ej_id, period):
+def get_table(ej_id, period, course_year, liter, site, school_year):
 	dataSchedule, dataAssessments = get_data(ej_id, period)
 	student_assessment = None
 	student_schedule = None
@@ -20,6 +21,7 @@ def get_table(ej_id, period):
 			if student.get('days',None) is None: continue
 			for days in student['days'].values():
 				day = days['name']
+				trimester = get_trimester(day)
 				if days.get('items', None) is None: continue
 				for item in days['items'].values():
 					course_name = item['name']
@@ -39,11 +41,11 @@ def get_table(ej_id, period):
 							'date':day,
 							'id':id,
 							'title':title,
-							# 'course_year':course_year,
-							# 'liter':liter,
-							# 'site':site,
-							# 'trimester':trimester,
-							# 'school_year':school_year,
+							'course_year':course_year,
+							'liter':liter,
+							'site':site,
+							'trimester':trimester,
+							'school_year':school_year,
 							'course_name': course_name,
 							'teacher':teacher,
   	          'score': value,
@@ -52,6 +54,5 @@ def get_table(ej_id, period):
 							'score_comment':comment
 					})
 
-	df = pd.DataFrame(rows)
-	print(df)
+	return rows
 
