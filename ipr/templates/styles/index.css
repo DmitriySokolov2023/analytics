@@ -1,0 +1,33 @@
+@import url(https://db.onlinewebfonts.com/c/23a02e8af5ef33a9b496dd524401550f?family=YS+Text+Regular+Regular);
+@page {
+	size: A4; /* Формат страницы */
+	margin: 0cm; /* Поля со всех сторон */
+}
+@font-face {
+	font-family: 'Grammatika';
+	src: url('Grammatika-Regular.otf') format('otf'); /* Резервный вариант */
+	font-weight: 400; /* Обычное начертание */
+	font-style: normal;
+	font-display: swap; /* Оптимизация загрузки */
+}
+
+body {
+	font-size: 16px;
+	font-family: 'YS Text Regular Regular';
+	padding: 0.5cm;
+	background-color: #f4f4f4;
+}
+
+.title {
+	color: #0c9488;
+	font-weight: 700;
+	margin-bottom: 20px;
+}
+
+.border__block {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.089);
+}
+
+.bold {
+	font-weight: 700;
+}
