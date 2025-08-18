@@ -1,6 +1,7 @@
-@import url(https://db.onlinewebfonts.com/c/23a02e8af5ef33a9b496dd524401550f?family=YS+Text+Regular+Regular);
+@import url(./fonts/fonts.css);
 @page {
 	size: A4; /* Формат страницы */
+	size: 210mm 297mm;
 	margin: 0cm; /* Поля со всех сторон */
 }
 @font-face {
@@ -13,7 +14,7 @@
 
 body {
 	font-size: 16px;
-	font-family: 'YS Text Regular Regular';
+	font-family: Gramatika;
 	padding: 0.5cm;
 	background-color: #f4f4f4;
 }
@@ -30,4 +31,39 @@ body {
 
 .bold {
 	font-weight: 700;
+}
+
+.border-b {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.089);
+}
+
+.undr-ln {
+	text-decoration: underline;
+	text-decoration-color: rgba(0, 0, 0, 0.089);
+	line-height: 2;
+	text-underline-offset: 4px;
+}
+.page-break {
+	page-break-after: always; /* Новая страница после элемента */
+}
+
+.brl {
+	border-top-left-radius: 20px;
+}
+
+.brr {
+	border-top-right-radius: 20px;
+}
+.brl-b {
+	border-bottom-left-radius: 20px;
+}
+.brr-b {
+	border-bottom-right-radius: 20px;
+}
+.nb {
+	border: none;
+}
+
+.tal {
+	text-align: left;
 }
